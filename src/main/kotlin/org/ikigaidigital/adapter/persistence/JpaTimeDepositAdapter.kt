@@ -11,7 +11,8 @@ import java.math.BigDecimal
 class JpaTimeDepositAdapter(
     private val repository: SpringDataDepositRepository
 ) : TimeDepositRepository {
-    override fun findAll(): List<TimeDepositReadModel> = repository.findAll().map { it.toReadModel() }
+    override fun findAll(): List<TimeDepositReadModel> =
+        repository.findAllByOrderByIdAsc().map { it.toReadModel() }
 
     override fun saveAll(deposits: List<TimeDeposit>) {
         val entitiesById = repository.findAllById(deposits.map { it.id }).associateBy { it.id }

@@ -83,6 +83,16 @@ class TimeDepositIntegrationTest {
     }
 
     @Test
+    fun getTimeDeposits_whenDatabaseIsEmpty_returnsOkAndEmptyArray() {
+        jdbcTemplate.update("DELETE FROM withdrawals")
+        jdbcTemplate.update("DELETE FROM time_deposits")
+
+        mockMvc.perform(get("/api/time-deposits"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$", hasSize<Any>(0)))
+    }
+
+    @Test
     fun putBalances_updatesAndPersistsEveryBalance() {
         mockMvc.perform(put("/api/time-deposits/balances"))
             .andExpect(status().isNoContent)

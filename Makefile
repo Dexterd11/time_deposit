@@ -1,4 +1,4 @@
-.PHONY: start stop restart logs connectdb migration ensure-env
+.PHONY: start stop restart resetdb logs connectdb migration ensure-env
 
 start: ensure-env
 	docker compose --env-file .env.dev -f compose.yaml up -d --build
@@ -17,6 +17,11 @@ stop:
 	docker compose --env-file .env.dev -f compose.yaml down
 
 restart: stop start
+
+resetdb:
+	@echo "Resetting PostgreSQL data volume; all local database data will be deleted."
+	docker compose --env-file .env.dev -f compose.yaml down -v
+	$(MAKE) start
 
 logs:
 	docker compose --env-file .env.dev -f compose.yaml logs -f app

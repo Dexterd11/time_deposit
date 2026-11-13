@@ -9,6 +9,30 @@ Kotlin and Spring Boot REST API using hexagonal architecture and PostgreSQL.
 - Docker Desktop with Docker Compose
 - A running Docker daemon for Testcontainers integration tests
 
+## Install Make
+
+Make is usually included with the macOS developer tools. If it is not
+available, install it with either command:
+
+```bash
+xcode-select --install
+# or, with Homebrew:
+brew install make
+```
+
+On Debian or Ubuntu Linux:
+
+```bash
+sudo apt update
+sudo apt install make
+```
+
+On Fedora, RHEL, or CentOS Linux:
+
+```bash
+sudo dnf group install "Development Tools"
+```
+
 ## Build And Test
 
 Run the complete test suite, including PostgreSQL Testcontainers tests:
@@ -33,6 +57,41 @@ The direct Compose command is also available after `.env.dev` exists:
 docker compose --env-file .env.dev -f compose.yaml up --build
 ```
 
+### Manual Startup Without Make
+
+Create `.env.dev` in the project root with the following values. Replace the
+password with a long random value.
+
+```dotenv
+POSTGRES_DB=time_deposit
+POSTGRES_USER=time_deposit_app
+POSTGRES_PASSWORD=replace-with-a-long-random-password
+APP_PORT=8080
+```
+
+Then start the application manually:
+
+```bash
+docker compose --env-file .env.dev -f compose.yaml up --build
+```
+
+The `.env.dev` file is ignored by Git and should not be committed.
+
+### Optional Sample Data
+
+Flyway creates the schema only. To load sample data for the API or Postman
+collection, run the following SQL through `make connectdb`:
+
+```sql
+INSERT INTO time_deposits (id, plan_type, balance, days)
+VALUES
+  (1, 'basic', 1200.00, 60),
+  (2, 'student', 1200.00, 365);
+
+INSERT INTO withdrawals (amount, date, time_deposit_id)
+VALUES (25.50, '2026-01-15', 1);
+```
+
 The API is available on `http://localhost:8080` and the OpenAPI UI is at
 `http://localhost:8080/swagger-ui.html`.
 
@@ -48,6 +107,19 @@ The API is available on `http://localhost:8080` and the OpenAPI UI is at
 
 The generated OpenAPI document is available at
 `http://localhost:8080/v3/api-docs`.
+
+## Postman Collection
+
+Import `postman/Time Deposit API.postman_collection.json` into Postman. Start
+the application first, then run the requests in order:
+
+1. **Get time deposits** shows the initial balances.
+2. **Update all balances** applies monthly interest and returns HTTP `204`.
+3. **Confirm persisted balances** calls GET again so the updated balances can
+   be verified from PostgreSQL-backed data.
+
+The collection uses the `baseUrl` variable, set to `http://localhost:8080` by
+default.
 
 ## API Examples
 
@@ -87,12 +159,16 @@ file is ignored by Git and is the only environment file used by this project.
 | `make start`                       | Creates `.env.dev` with random credentials if needed, then builds and starts the app and PostgreSQL containers. |
 | `make stop`                        | Stops and removes the app and PostgreSQL containers while preserving the database volume.                       |
 | `make restart`                     | Stops and starts the containers again using the existing `.env.dev`.                                            |
+| `make resetdb`                     | Deletes the PostgreSQL volume and starts fresh with the current `.env.dev` credentials.                          |
 | `make logs`                        | Follows live logs from the application container. Press `Ctrl+C` to stop following logs.                        |
 | `make connectdb`                   | Opens an interactive `psql` session inside the PostgreSQL container.                                            |
 | `make migration NAME=add_a_column` | Creates a timestamped Flyway migration file under `src/main/resources/db/migration`.                            |
 
 The generated `.env.dev` is ignored by Git and is reused on later starts so the
 credentials remain compatible with the persistent PostgreSQL volume.
+
+Use `make resetdb` when the database volume was initialized with different
+credentials. This is destructive and deletes all local PostgreSQL data.
 
 The Compose file is `compose.yaml` and the local project instructions are in `AGENTS.md`.
 

@@ -1,0 +1,71 @@
+{
+  "info": {
+    "name": "Time Deposit API",
+    "description": "Requests for checking and updating time deposit balances.\n\nOptional sample data for local development:\nINSERT INTO time_deposits (id, plan_type, balance, days) VALUES (1, 'basic', 1200.00, 60), (2, 'student', 1200.00, 365);\nINSERT INTO withdrawals (amount, date, time_deposit_id) VALUES (25.50, '2026-01-15', 1);",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "Get time deposits",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/time-deposits",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "time-deposits"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Update all balances",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/time-deposits/balances",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "time-deposits",
+            "balances"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Confirm persisted balances",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/time-deposits",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "time-deposits"
+          ]
+        }
+      }
+    }
+  ]
+}

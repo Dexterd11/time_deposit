@@ -1,0 +1,7 @@
+.env.dev
+.git
+.gitignore
+target
+*.iml
+.idea
+README.md
